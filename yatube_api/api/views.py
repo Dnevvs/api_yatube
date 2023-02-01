@@ -1,8 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from posts.models import Comment, Group, Post
-from rest_framework import viewsets
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework import mixins, viewsets
 
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
 
@@ -50,9 +49,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         return new_queryset
 
 
-class GroupViewSet(viewsets.ModelViewSet):
+class NotPostViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
+
+
+class GroupViewSet(NotPostViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-
-    def perform_create(self, serializer):
-        raise MethodNotAllowed('Добавление группы запрещено!')
