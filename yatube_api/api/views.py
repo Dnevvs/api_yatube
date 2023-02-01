@@ -1,9 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from posts.models import Comment, Group, Post
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import viewsets
+from rest_framework.exceptions import MethodNotAllowed
 
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
 
@@ -51,24 +50,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return new_queryset
 
 
-@api_view(['GET'])
-def api_group(request):
-    group = Group.objects.all()
-    serializer = GroupSerializer(group, many=True)
-    return Response(serializer.data)
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
-
-@api_view(['GET', 'DELETE', 'PUT', 'PATCH'])
-def api_group_detail(request, pk):
-    group = Group.objects.get(id=pk)
-    if request.method == 'PUT' or request.method == 'PATCH':
-        serializer = GroupSerializer(group, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        Group.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    serializer = GroupSerializer(group)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    def perform_create(self, serializer):
+        raise MethodNotAllowed('Добавление группы запрещено!')

@@ -30,7 +30,7 @@ tests/test_comment.py::TestCommentAPI::test_comment_delete_by_unauth PASSED [ 44
 tests/test_group.py::TestGroupAPI::test_group_not_found PASSED           [ 46%]
 tests/test_group.py::TestGroupAPI::test_group_not_auth PASSED            [ 48%]
 tests/test_group.py::TestGroupAPI::test_group_auth_get PASSED            [ 51%]
-tests/test_group.py::TestGroupAPI::test_group_create PASSED              [ 53%]
+tests/test_group.py::TestGroupAPI::test_group_create FAILED              [ 53%]
 tests/test_group.py::TestGroupAPI::test_group_get_post PASSED            [ 55%]
 tests/test_group.py::TestGroupAPI::test_group_page_not_found PASSED      [ 57%]
 tests/test_group.py::TestGroupAPI::test_group_page_not_auth PASSED       [ 59%]
@@ -55,4 +55,29 @@ tests/test_settings.py::TestSettings::test_drf_in_installed_apps[rest_framework.
 tests/test_settings.py::TestSettings::test_api_in_installed_apps PASSED  [ 97%]
 tests/test_settings.py::TestSettings::test_auth_settings PASSED          [100%]
 
-============================= 49 passed in 8.50s ==============================
+================================== FAILURES ===================================
+_______________________ TestGroupAPI.test_group_create ________________________
+
+self = <tests.test_group.TestGroupAPI object at 0x000002792F984100>
+user_client = <rest_framework.test.APIClient object at 0x000002792F9E01C0>
+group_1 = <Group: Группа 1>, group_2 = <Group: Группа 2>
+
+    @pytest.mark.django_db(transaction=True)
+    def test_group_create(self, user_client, group_1, group_2):
+        data = {'title': 'Группа  номер 3'}
+        response = user_client.post('/api/v1/groups/', data=data)
+>       assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
+            'Убедитесь, что группу можно создавать только через админку, '
+            'а при попытке создать ее через API возвращается статус 405.'
+        )
+E       AssertionError: Убедитесь, что группу можно создавать только через админку, а при попытке создать ее через API возвращается статус 405.
+E       assert 400 == <HTTPStatus.METHOD_NOT_ALLOWED: 405>
+E         +400
+E         -<HTTPStatus.METHOD_NOT_ALLOWED: 405>
+
+tests\test_group.py:77: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:224 Bad Request: /api/v1/groups/
+=========================== short test summary info ===========================
+FAILED tests/test_group.py::TestGroupAPI::test_group_create - AssertionError:...
+======================== 1 failed, 48 passed in 9.12s =========================
