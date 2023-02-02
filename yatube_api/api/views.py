@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from posts.models import Comment, Group, Post
-from rest_framework import mixins, viewsets
+from rest_framework import viewsets
 
 from .serializers import CommentSerializer, GroupSerializer, PostSerializer
 
@@ -49,16 +49,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         return new_queryset
 
 
-class NotPostViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
-
-
-class GroupViewSet(NotPostViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
